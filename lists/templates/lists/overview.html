@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load lists_extras %}
+
+{% block js %}
+<script src="{% static 'lists/js/jquery.tablesorter.min.js' %}"></script>
+<script type="text/javascript" id="js">
+$(document).ready(function() {
+  var timeExtraction = function(node) {
+    if ($(node).attr('data-time-in-seconds') !== undefined) {
+      return '-' + node.getAttribute('data-time-in-seconds');
+    } else {
+      return node.innerHTML;
+    }
+  }
+  $("#todolist-overview-table").tablesorter({
+    textExtraction: timeExtraction
+  });
+});
+</script>
+{% endblock %}
+
+{% block css %}
+ {% endblock %}
+
+{% block body %}
+<style>
+/* tables */
+
+table.tablesorter {
+ 
+  margin: 10px 0pt 15px;
+  width: 100%;
+  text-align: left;
+}
+
+table.tablesorter thead tr th,
+table.tablesorter tbody tr td,
+table.tablesorter tfoot tr th {
+  padding: 10px;
+  text-align: center;
+}
+
+table.tablesorter th:first-child,
+table.tablesorter tbody tr td:first-child {
+  text-align: left;
+}
+
+table.tablesorter thead tr th,
+table.tablesorter tfoot tr th {
+  border: 1px solid #FFF;
+}
+
+table.tablesorter th:last-child {
+  border-right: 0px solid #FFF;
+}
+
+table.tablesorter thead tr .header {
+  background-image: url(../images/bg.gif);
+  background-repeat: no-repeat;
+  background-position: center right;
+  cursor: pointer;
+}
+
+table.tablesorter tbody td {
+  color: #3D3D3D;
+  padding: 4px;
+ 
+  vertical-align: top;
+}
+
+table.tablesorter thead tr .headerSortUp {
+  background-image: url(../images/asc.gif);
+}
+
+table.tablesorter thead tr .headerSortDown {
+  background-image: url(../images/desc.gif);
+}
+
+table.tablesorter thead tr .headerSortDown,
+table.tablesorter thead tr .headerSortUp {
+  background-color: none;
+  
+  
+}
+
+</style>
+
+
+
+<section class="header">
+  <h2 class="title" style="font-weight: bold;">Start your TODO by a topic 🎯</h2>
+  <div class="row">
+    <div class="three columns value-prop"></div>
+    <div class="six columns">
+      <form action="{% url 'lists:add_todolist' %}" method=post>
+        {% csrf_token %}
+        <dl>
+          <dd>{{ form }}
+          <dt><input type="submit" value="Submit">
+        </dl>
+      </form>
+    </div>
+  </div>
+  <div class="row">
+    <div class="u-full-width">
+      <h6 class="docs-header todolist-overview">All your todolists</h6>
+      <table id="todolist-overview-table" class="tablesorter">
+        <thead style="background-color: #FCC419;">
+          <tr>
+            <th class='todolist-title' style="font-size: 20px; border-radius: 10px; border-right-width: 10px;">Task title</th>
+            <th style="font-size: 20px; border-radius: 10px; border-right-width: 10px;"># Pending</th>
+            <th style="font-size: 20px; border-radius: 10px; border-right-width: 10px;"># Finished</th>
+            <th class="datetime" style="font-size: 20px; border-radius: 10px; border-right-width: 10px;">Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for todolist in user.todolists.all %}
+          <tr>
+            <td class='todolist-title'><a style="text-decoration: none; font-weight: bold; font-family: 'roboto', sans-serif; color: black; font-size: 15px;" href="{% url 'lists:todolist' todolist_id=todolist.id %}">{{ todolist.title }}</a></td>
+            <td >{{ todolist.count_open }}</td>
+            <td>{{ todolist.count_finished }}</td>
+            <td data-time-in-seconds="{{ todolist.created_at|in_seconds }}">{{ todolist.created_at|humanize }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Djodolist</title>
+  <meta name="description" content="Small todolist app.">
+  <meta name="author" content="Christian Rotzoll">
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+  {% load static %}
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" type='text/css' href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.2/normalize.min.css">
+  <link rel="stylesheet" type='text/css' href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+  <link rel="stylesheet" type='text/css' href="{% static 'css/custom.css' %}">
+  {% block css %}{% endblock %}
+  <!-- Scripts
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script type="text/javascript" src="{% static 'js/site.js' %}"></script>
+  {% block js %}{% endblock %}
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}" />
+</head>
+
+<body>
+
+
+  <div class="main" style="font-family: 'roboto', sans-serif;">
+    <div class="head" style="display: flex; justify-content: space-between; margin: 0 40px; align-items: center; padding: 20px 40px; flex-direction: row;">
+      <div class="greeting" style="display: flex; flex-direction: column;">
+        <p id="goodmorninguser" style="font-size: 30px; font-weight: 700; font-family: 'roboto', sans-serif; margin-bottom: -30px;">
+          <a style="text-decoration: none; color: black;" href="{% url 'lists:index' %}">Good morning, </a>{{ user.username }}.
+        </p>
+        <br />
+        <p id="location" style="font-size: 17px; font-weight: 600; font-family: 'roboto', sans-serif;">
+          Chittagong <span id="temp">41</span> degree 🔥
+        </p>
+      </div>
+      <div class="account" style="display: flex; flex-direction: row; align-items: center;">
+        <div class="profile" style="margin-right: 10px; line-height: 0.1;">
+          <img src="{% static 'images/profile.jpg' %}" alt="profile" style="width: 60px; height: 60px; border-radius: 20%;">
+        </div>
+        <div class="name" style="display: flex; flex-direction: column;">
+          {% if user.is_authenticated %}
+          <p class="navbar-link" id="username" style="font-size: 22px; font-weight: 700; font-family: 'roboto', sans-serif; margin-bottom: -40px; margin-left: 10%;">{{ user.username }}</p>
+          {% else %}
+          <a class="navbar-link" href="{% url 'auth:login' %}" style="text-decoration: none; height: 0px; color: black; font-size: 15px; font-weight: 700; font-family: 'roboto', sans-serif; margin-bottom: -40px; margin-left: 10%;">Login</a>
+          {% endif %}
+          <br />
+          <p id="probadge" style="font-size: 18px; font-weight: 600; font-family: 'roboto', sans-serif; color: #ffc107;">🍕 PRO</p>
+        </div>
+        <div class="popover-container">
+          <div class="popover-icon" style="font-size: 54px; cursor: pointer;">&#127919;</div>
+          <div id="moreNavPopover" class="popover" style="position: absolute; display: none; background-color: #f9f9f9; min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2); z-index: 1; animation: fade-in 0.3s ease-in;">
+            <ul class="popover-list" style="list-style-type: none; padding: 0; margin: 0;">
+              <li class="popover-item" style="padding: 8px 12px; cursor: pointer;">
+                <a class="popover-link" href="{% url 'lists:overview' %}" style="text-decoration: none; color: black;">Your Todo Lists</a>
+              </li>
+              <li class="popover-item" style="padding: 8px 12px; cursor: pointer;">
+                <a class="popover-link" href="{% url 'auth:logout' %}" style="text-decoration: none; color: black;">Logout</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <div class="container">
+    <!-- Navigation
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+    <nav class="navbar">
+      <div class="container">
+        
+       
+      </div>
+    </nav>
+    {% block body %}{% endblock %}
+  </div>
+  <!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+  const popoverContainer = document.querySelector('.popover-container');
+  const popover = document.querySelector('.popover');
+
+  popoverContainer.addEventListener('click', function () {
+    popover.style.display = 'block';
+    positionPopover();
+  });
+
+  document.addEventListener('click', function (event) {
+    const isClickInsidePopover = popover.contains(event.target);
+    const isClickInsidePopoverContainer = popoverContainer.contains(event.target);
+    if (!isClickInsidePopover && !isClickInsidePopoverContainer) {
+      popover.style.display = 'none';
+    }
+  });
+
+  function positionPopover() {
+    const popoverIcon = document.querySelector('.popover-icon');
+    const iconRect = popoverIcon.getBoundingClientRect();
+
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    const popoverWidth = popover.offsetWidth;
+    const popoverHeight = popover.offsetHeight;
+
+    const popoverTop = iconRect.bottom + 5; // Adjust the offset as needed
+    const popoverLeft = iconRect.left;
+
+    // Check if the popover overflows on the right side
+    if (popoverLeft + popoverWidth > windowWidth) {
+      popover.style.left = (windowWidth - popoverWidth) + 'px';
+    } else {
+      popover.style.left = popoverLeft + 'px';
+    }
+
+    // Check if the popover overflows on the bottom
+    if (popoverTop + popoverHeight > windowHeight) {
+      popover.style.top = (windowHeight - popoverHeight) + 'px';
+    } else {
+      popover.style.top = popoverTop + 'px';
+    }
+  }
+});
+
+</script>
+</html>
